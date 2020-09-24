@@ -70,45 +70,43 @@ void print_matrix (int n, float matrix[n][n]) {
     }
 }
 
+void matrix_vector_mult(int n, float A[n][n], float a[n])
+{
+    double ans[2][1];
+
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 1; ++j)
+        {
+            ans[i][j] = 0;
+        }
+    }
+
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < n; ++j)
+        {
+            ans[i][0] += A[i][j] * a[j];
+        }
+    }
+
+    for (int i = 0; i < n; ++i) {
+        a[i] = ans[i][0];
+    }
+}
+
 void vector_basis_change(int n, float matrix[n][n], float vector[3])
 {
-    float D = det_3x3(n, matrix);
-    float d1[n][n];
-    float d2[n][n];
-    float d3[n][n];
+    float tmp_matrix[n][n];
 
     //  d1
-    matrix_mirroring(n, matrix, d1);
-    // print_matrix(n, d1);
-
-    for (int i = 0; i < n; ++i)
-    {
-        d1[i][0] = vector[i];
+    matrix_mirroring(n, matrix, tmp_matrix);
+    
+    matrix_vector_mult(n, tmp_matrix, vector);
+    for (int i = 0; i < 3; ++i) {
+        printf("%.6f ", vector[i]);
     }
-
-    //  d2
-    matrix_mirroring(n, matrix, d2);
-    // print_matrix(n, d2);
-
-    for (int i = 0; i < n; ++i)
-    {
-        d2[i][1] = vector[i];
-    }
-
-    //  d3
-    matrix_mirroring(n, matrix, d3);
-    // print_matrix(n, d3);
-
-    for (int i = 0; i < n; ++i)
-    {
-        d3[i][2] = vector[i];
-    }
-
-    float x1 = det_3x3(n, d1) / D;
-    float x2 = det_3x3(n, d2) / D;
-    float x3 = det_3x3(n, d3) / D;
-
-    printf("%.6f %.6f %.6f\n", x1, x2, x3);
+    printf(" \n");
 }
 
 int main()
