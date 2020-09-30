@@ -73,7 +73,7 @@ void vector_basis_change(int n, float matrix[n][n], float vector[3])
     float d2 = det_3x3(n, tmp_matrix2);
     float d3 = det_3x3(n, tmp_matrix3);
 
-    printf("%.6f %.6f %.6f\n", d1/main_det, d2/main_det, d3/main_det);
+    printf("%.6f %.6f %.6f\n", d1 / main_det, d2 / main_det, d3 / main_det);
 }
 
 int main()
