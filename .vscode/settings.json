@@ -3,6 +3,15 @@
         "random": "c",
         "cmath": "c",
         "complex": "c",
-        "vector": "c"
+        "vector": "c",
+        "iostream": "cpp",
+        "iosfwd": "cpp",
+        "__nullptr": "cpp",
+        "initializer_list": "cpp",
+        "limits": "cpp",
+        "type_traits": "cpp",
+        "algorithm": "cpp",
+        "stdexcept": "cpp",
+        "ostream": "cpp"
     }
 }
