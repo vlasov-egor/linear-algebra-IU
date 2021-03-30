@@ -12,6 +12,7 @@
         "type_traits": "cpp",
         "algorithm": "cpp",
         "stdexcept": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "__locale": "cpp"
     }
 }
