@@ -160,7 +160,7 @@ public:
             // sort
             for (int j = i; j < this->rows - 1; j++)
             {
-                if (this->values[j][i] > this->values[j + 1][i])
+                if (this->values[j][i] > this->values[j + 1][i] && i == 0 or this->values[j][i] < this->values[j + 1][i] && i != 0)
                 {
                     flag = true;
                     // swap
@@ -179,7 +179,7 @@ public:
                 step++;
                 cout << "step #" << step << ": permutation" << endl;
 
-                cout << setprecision(2) << fixed << setprecision(3) << this << endl;
+                cout << setprecision(2) << fixed << this;
 
                 permutations++;
                 flag = false;
@@ -198,7 +198,7 @@ public:
                 {
                     this->values[j][k] -= (this->values[i][k] * ratio);
                 }
-                cout << setprecision(2) << fixed << this << endl;
+                cout << setprecision(2) << fixed << this;
             }
         }
 
@@ -209,6 +209,7 @@ public:
         {
             result *= this->values[i][i];
         }
+
         cout << setprecision(2) << fixed << result * pow(-1, permutations) << endl;
     }
 };
