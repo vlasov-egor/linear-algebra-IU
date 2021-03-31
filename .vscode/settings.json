@@ -13,6 +13,7 @@
         "algorithm": "cpp",
         "stdexcept": "cpp",
         "ostream": "cpp",
-        "__locale": "cpp"
+        "__locale": "cpp",
+        "iomanip": "cpp"
     }
 }

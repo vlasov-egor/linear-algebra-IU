@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <iomanip>
 
 using namespace std;
 
@@ -130,6 +131,10 @@ ostream &operator<<(ostream &out, Matrix<T> *o)
     return out;
 }
 
+int step = 0;
+bool flag = false;
+int permutations = 0;
+
 template <class T>
 class SqMatrix : public Matrix<T>
 {
@@ -146,6 +151,65 @@ public:
         {
             this->values[i] = new T[rows];
         }
+    }
+
+    void determinant()
+    {
+        for (int i = 0; i < this->rows; i++)
+        {
+            // sort
+            for (int j = i; j < this->rows - 1; j++)
+            {
+                if (this->values[j][i] > this->values[j + 1][i])
+                {
+                    flag = true;
+                    // swap
+                    for (int k = 0; k < this->rows; k++)
+                    {
+                        T swap = this->values[j + 1][k];
+                        this->values[j + 1][k] = this->values[j][k];
+                        this->values[j][k] = swap;
+                    }
+                }
+            }
+
+            if (flag)
+            {
+                // step calc
+                step++;
+                cout << "step #" << step << ": permutation" << endl;
+
+                cout << setprecision(2) << fixed << setprecision(3) << this << endl;
+
+                permutations++;
+                flag = false;
+            }
+
+            for (int j = i + 1; j < this->rows; j++)
+            {
+                // step calc
+                step++;
+                cout << "step #" << step << ": elimination" << endl;
+
+                float ratio = this->values[j][i] / this->values[i][i];
+
+                // elimination
+                for (int k = 0; k < this->rows; k++)
+                {
+                    this->values[j][k] -= (this->values[i][k] * ratio);
+                }
+                cout << setprecision(2) << fixed << this << endl;
+            }
+        }
+
+        cout << "result:" << endl;
+        float result = 1;
+
+        for (int i = 0; i < this->rows; i++)
+        {
+            result *= this->values[i][i];
+        }
+        cout << setprecision(2) << fixed << result * pow(-1, permutations) << endl;
     }
 };
 
@@ -228,22 +292,9 @@ public:
 
 int main(int argc, char const *argv[])
 {
-
     auto a = SqMatrix<float>(0);
     cin >> &a;
 
-    auto i = IdentityMatrix<float>(3);
-    cout << (Matrix<float> *)&i;
-
-    auto el = EleminationMatrix<float>(a, 2, 1);
-    cout << (Matrix<float> *)&el;
-
-    auto b = el * a;
-    cout << (Matrix<float> *)&b;
-
-    auto p = PermutationMatrix<float>(a);
-    cout << (Matrix<float> *)&p;
-
-    auto c = p * a;
-    cout << (Matrix<float> *)&c;
+    // cout << (Matrix<float> *)&a;
+    a.determinant();
 }
