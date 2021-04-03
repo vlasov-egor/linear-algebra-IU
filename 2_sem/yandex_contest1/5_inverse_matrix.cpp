@@ -7,6 +7,7 @@ using namespace std;
 
 int step = 0;
 bool flag = false;
+bool flag1 = false;
 int permutations = 0;
 
 template <class T>
@@ -45,41 +46,103 @@ public:
         return res;
     }
 
-    void Gaussian_elim()
+    void direct_elimination()
     {
         for (int i = 0; i < this->columns / 2; i++)
         {
-            float pivot = this->values[i][i];
 
-            // if pivot == 0
-            if (!pivot)
+            // permutation
+            for (int j = i; j < this->rows - 1; j++)
             {
-                for (int k = i + 1; k < this->rows; k++)
+                for (int k = j + 1; k < this->rows; k++)
                 {
-                    if (this->values[k][i])
+                    if (abs(this->values[j][i]) < abs(this->values[k][i]))
                     {
                         // swap
+                        flag1 = true;
                         for (int q = 0; q < this->columns; q++)
                         {
-                            float buffer = this->values[k][q];
-                            this->values[k][q] = this->values[i][q];
-                            this->values[i][q] = buffer;
+                            T buffer = this->values[j][q];
+                            this->values[j][q] = this->values[k][q];
+                            this->values[k][q] = buffer;
                         }
-                        cout << "swapped" << endl;
-                        break;
                     }
                 }
             }
 
+            if (flag1)
+            {
+                cout << "step #" << step << ": permutation" << endl;
+                cout << setprecision(2) << fixed << this;
+
+                step++;
+                flag1 = false;
+            }
+
+            T pivot = this->values[i][i];
+
+            // elemination
             for (int j = i + 1; j < this->rows; j++)
             {
+
+                if (!this->values[j][i])
+                {
+                    continue;
+                }
+
+                // step calc
+                cout << "step #" << step << ": elimination" << endl;
+                step++;
+
                 float ratio = this->values[j][i] / pivot;
+
                 for (int k = 0; k < this->columns; k++)
                 {
                     this->values[j][k] -= (this->values[i][k] * ratio);
                 }
+
+                cout << setprecision(2) << fixed << this;
             }
         }
+    }
+
+    void backward_elimination()
+    {
+        for (int i = this->columns / 2 - 1; i > -1; i--)
+        {
+            for (int j = i; j > -1; j--)
+            {
+                if (i != j)
+                {
+                    // step calc
+                    cout << "step #" << step << ": elimination" << endl;
+                    step++;
+
+                    float ratio = this->values[j][i] / this->values[i][i];
+
+                    for (int k = 0; k < this->columns; k++)
+                    {
+                        this->values[j][k] -= (this->values[i][k] * ratio);
+                    }
+
+                    cout << setprecision(2) << fixed << this;
+                }
+            }
+        }
+    }
+
+    void diagonal()
+    {
+        for (int i = 0; i < this->rows; i++)
+        {
+            float ratio = this->values[i][i];
+            for (int j = 0; j < this->columns; j++)
+            {
+                this->values[i][j] /= ratio;
+            }
+        }
+
+        cout << setprecision(2) << fixed << this;
     }
 };
 
@@ -164,7 +227,7 @@ ostream &operator<<(ostream &out, Matrix<T> *o)
     {
         for (int j = 0; j < o->columns; j++)
         {
-            out << o->values[i][j] << " ";
+            out << ((abs(o->values[i][j]) < 0.0005) ? 0.00 : o->values[i][j]) << " ";
         }
         out << endl;
     }
@@ -350,16 +413,37 @@ int main(int argc, char const *argv[])
          << ": Augmented Matrix" << endl;
     step++;
 
-    cout << (Matrix<float> *)&aug;
+    cout << setprecision(2) << fixed << (Matrix<float> *)&aug;
 
     // step 1-6
     cout << "Direct way:" << endl;
-    aug.Gaussian_elim();
-    cout << (Matrix<float> *)&aug;
+    aug.direct_elimination();
 
     // step 7-12
+    cout << "Way back:" << endl;
+    aug.backward_elimination();
 
     // diagonal
+    cout << "Diagonal normalization:" << endl;
+    aug.diagonal();
 
     // res
+    cout << "result:" << endl;
+    for (int i = 0; i < aug.rows; i++)
+    {
+        for (int j = aug.columns / 2; j < aug.columns; j++)
+        {
+            cout << aug.values[i][j] << " ";
+        }
+        cout << endl;
+    }
 }
+
+/*
+
+3
+-1 2 -2
+2 -1 5
+3 -2 4
+
+*/
