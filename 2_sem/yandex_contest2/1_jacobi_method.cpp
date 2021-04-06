@@ -2,6 +2,7 @@
 #include <string>
 #include <cmath>
 #include <iomanip>
+#include <vector>
 
 using namespace std;
 
@@ -287,6 +288,41 @@ istream &operator>>(istream &input, ColumnVector<T> *o)
     return input;
 }
 
+float error(Matrix<float> a)
+{
+    float sum = 0;
+
+    for (int i = 0; i < a.rows; i++)
+    {
+        sum += a.values[i][0] * a.values[i][0];
+    }
+
+    return sqrt(sum);
+}
+
+bool convergence_test(Matrix<float> a)
+{
+    float sum1 = 0;
+    float sum2 = 0;
+
+    for (int i = 0; i < a.rows; i++)
+    {
+        for (int j = 0; j < a.columns; j++)
+        {
+            if (i == j)
+            {
+                sum1 += fabs(a.values[i][j]);
+            }
+            else
+            {
+                sum2 += fabs(a.values[i][j]);
+            }
+        }
+    }
+
+    return sum1 < sum2 ? true : false;
+}
+
 int main(int argc, char const *argv[])
 {
     cout << setprecision(4) << fixed;
@@ -300,7 +336,13 @@ int main(int argc, char const *argv[])
     float epsilon;
     cin >> epsilon;
 
-    auto alpha = SqMatrix<float>(0);
+    if (convergence_test(a))
+    {
+        cout << "The method is not applicable!";
+        return 0;
+    }
+
+    auto alpha = Matrix<float>(0, 0);
     auto beta = ColumnVector<float>(0);
 
     alpha = a;
@@ -329,4 +371,50 @@ int main(int argc, char const *argv[])
          << (Matrix<float> *)&alpha
          << "beta:" << endl
          << (Matrix<float> *)&beta;
+
+    // iterative algo
+    vector<Matrix<float>> x;
+    vector<float> e;
+
+    x.push_back(beta);
+
+    int i = 1;
+    bool flag = true;
+
+    while (flag)
+    {
+        auto tmp = Matrix<float>(0, 0);
+        tmp = alpha * x[i - 1];
+        tmp = tmp + beta;
+
+        if (error(tmp - x[i - 1]) < epsilon)
+        {
+            flag = false;
+        }
+
+        x.push_back(tmp);
+
+        // cout << "x(" << i << "):" << endl;
+        // cout << (Matrix<float> *)&tmp;
+
+        i++;
+    }
+
+    auto answer = x[x.size() - 1];
+    float tmp_e;
+    for (int i = 0; i < x.size() - 1; i++)
+    {
+        tmp_e = error(x[i] - x[i + 1]);
+        e.push_back(tmp_e);
+    }
+
+    for (int i = 0; i < x.size(); i++)
+    {
+        cout << "x(" << i << "):" << endl;
+        cout << (Matrix<float> *)&x[i];
+        if (i != x.size() - 1)
+        {
+            cout << "e: " << e[i] << endl;
+        }
+    }
 }
