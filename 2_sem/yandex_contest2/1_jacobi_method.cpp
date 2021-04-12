@@ -414,6 +414,10 @@ int main(int argc, char const *argv[])
 }
 
 /*
+
+test 3:
+
+
 4
 20.9 1.2 2.1 0.9 
 1.2 21.2 1.5 2.5 
@@ -468,5 +472,3 @@ x(4):
 1.3059
 
 */
-
-// problems with exit factor
