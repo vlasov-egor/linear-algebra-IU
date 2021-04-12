@@ -288,39 +288,42 @@ istream &operator>>(istream &input, ColumnVector<T> *o)
     return input;
 }
 
-float error(Matrix<float> a)
+float error(Matrix<float> a, Matrix<float> b)
 {
     float sum = 0;
 
     for (int i = 0; i < a.rows; i++)
     {
-        sum += a.values[i][0] * a.values[i][0];
+        sum += (a.values[i][0] - b.values[i][0]) * (a.values[i][0] - b.values[i][0]);
     }
 
     return sqrt(sum);
 }
 
-bool convergence_test(Matrix<float> a)
+bool diagonal_dominance(Matrix<float> a)
 {
-    float sum1 = 0;
-    float sum2 = 0;
+    float sum = 0;
 
     for (int i = 0; i < a.rows; i++)
     {
         for (int j = 0; j < a.columns; j++)
         {
-            if (i == j)
+            if (i != j)
             {
-                sum1 += fabs(a.values[i][j]);
-            }
-            else
-            {
-                sum2 += fabs(a.values[i][j]);
+                sum += fabs(a.values[i][j]);
             }
         }
+
+        if (sum >= fabs(a.values[i][i]))
+        {
+
+            return true;
+        }
+
+        sum = 0;
     }
 
-    return sum1 < sum2 ? true : false;
+    return false;
 }
 
 int main(int argc, char const *argv[])
@@ -336,7 +339,7 @@ int main(int argc, char const *argv[])
     float epsilon;
     cin >> epsilon;
 
-    if (convergence_test(a))
+    if (diagonal_dominance(a))
     {
         cout << "The method is not applicable!";
         return 0;
@@ -376,45 +379,96 @@ int main(int argc, char const *argv[])
     vector<Matrix<float>> x;
     vector<float> e;
 
-    x.push_back(beta);
-
-    int i = 1;
     bool flag = true;
+    int index = 1;
+
+    x.push_back(beta);
 
     while (flag)
     {
-        auto tmp = Matrix<float>(0, 0);
-        tmp = alpha * x[i - 1];
-        tmp = tmp + beta;
+        auto tmp_x = Matrix<float>(0, 0);
+        tmp_x = alpha * x[index - 1];
+        tmp_x = tmp_x + beta;
+        x.push_back(tmp_x);
 
-        if (error(tmp - x[i - 1]) < epsilon)
+        float curr_err = error(tmp_x, x[index - 1]);
+
+        if (curr_err < epsilon)
         {
             flag = false;
         }
 
-        x.push_back(tmp);
-
-        // cout << "x(" << i << "):" << endl;
-        // cout << (Matrix<float> *)&tmp;
-
-        i++;
-    }
-
-    auto answer = x[x.size() - 1];
-    float tmp_e;
-    for (int i = 0; i < x.size() - 1; i++)
-    {
-        tmp_e = error(x[i] - x[i + 1]);
-        e.push_back(tmp_e);
+        e.push_back(curr_err);
+        index++;
     }
 
     for (int i = 0; i < x.size(); i++)
     {
-        cout << "x(" << i << "):" << endl;
-        cout << (Matrix<float> *)&x[i];
-        if (i != x.size() - 1)
+        cout << "x(" << i << "):" << endl
+             << (Matrix<float> *)&x[i];
+
+        if (i < x.size() - 1)
         {
-            cout << "e: " << e[i] << endl;
+            cout << "e: "
+                 << e[i] << endl;
         }
     }
 }
+
+/*
+4
+20.9 1.2 2.1 0.9 
+1.2 21.2 1.5 2.5 
+2.1 1.5 19.8 1.3 
+0.9 2.5 1.3 32.1 
+
+4
+21.70 27.46 28.76 49.72  
+
+0.01
+
+
+alpha:
+0.0000 -0.0574 -0.1005 -0.0431
+-0.0574 0.0000 -0.0708 -0.1179
+-0.0991 -0.0708 0.0000 -0.0657
+-0.0455 -0.1263 -0.0657 0.0000
+beta:
+1.0383
+1.2953
+1.4525
+1.5489
+
+x(0):
+1.0383
+1.2953
+1.4525
+1.5489
+e: 0.6188
+x(1):
+0.7513
+0.9502
+1.1563
+1.2428
+e: 0.1430
+x(2):
+0.8140
+1.0238
+1.2293
+1.3189
+e: 0.0330
+x(3):
+0.7992
+1.0060
+1.2129
+1.3019
+e: 0.0076
+x(4):
+0.8026
+1.0101
+1.2167
+1.3059
+
+*/
+
+// problems with exit factor
