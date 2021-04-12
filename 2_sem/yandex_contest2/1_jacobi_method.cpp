@@ -354,14 +354,12 @@ int main(int argc, char const *argv[])
     float pivot = 0;
     for (int i = 0; i < alpha.rows; i++)
     {
+        pivot = alpha.values[i][i];
+        alpha.values[i][i] = 0;
+
         for (int j = 0; j < alpha.columns; j++)
         {
-            if (i == j)
-            {
-                pivot = alpha.values[i][j];
-                alpha.values[i][j] = 0;
-            }
-            else
+            if (i != j)
             {
                 alpha.values[i][j] /= -1 * pivot;
             }
