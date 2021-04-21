@@ -494,7 +494,7 @@ int main(int argc, char const *argv[])
     auto aug = AugmentedMatrix<float>(buf1);
     aug.inversed();
 
-    // buf1: (I - B)_-1:
+    // buf2: (I - B)_-1:
     auto buf2 = Matrix<float>(aug.rows, aug.columns / 2);
     for (int i = 0; i < aug.rows; i++)
     {
@@ -516,41 +516,14 @@ int main(int argc, char const *argv[])
 
     x.push_back(beta);
 
-    // ----------------------------------------
-    auto l_p = Matrix<float>(a.rows, a.columns);
-    auto u = Matrix<float>(a.rows, a.columns);
-
-    for (int i = 0; i < a.rows; i++)
-    {
-        for (int j = 0; j < a.columns; j++)
-        {
-            if (i < j)
-            {
-                u.values[i][j] = a.values[i][j];
-            }
-            else
-            {
-                l_p.values[i][j] = a.values[i][j];
-            }
-        }
-    }
-    auto l_p_aug = AugmentedMatrix<float>(l_p);
-    l_p_aug.inversed();
-    auto buf3 = Matrix<float>(l_p_aug.rows, l_p_aug.columns / 2);
-    for (int i = 0; i < l_p_aug.rows; i++)
-    {
-        for (int j = l_p_aug.columns / 2; j < l_p_aug.columns; j++)
-        {
-            buf3.values[i][j - l_p_aug.columns / 2] = l_p_aug.values[i][j];
-        }
-    }
-
     while (flag)
     {
         auto tmp_x = Matrix<float>(0, 0);
-        tmp_x = u * x[index - 1];
-        tmp_x = beta - tmp_x;
-        tmp_x = buf3 * tmp_x;
+        tmp_x = C * x[index - 1];
+        tmp_x = beta + tmp_x;
+        tmp_x = buf2 * tmp_x;
+
+        // some calc
 
         x.push_back(tmp_x);
 
